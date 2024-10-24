@@ -180,13 +180,35 @@ this.addEventListener("message", function(e) {
 			if (testState == 5) return;
 			if (test_pointer >= settings.test_order.length) {
 				//test is finished
-				if (settings.telemetry_level > 0)
+				if (settings.telemetry_level > 0) {
 					sendTelemetry(function(id) {
 						testState = 4;
 						if (id != null) testId = id;
 					});
-				else testState = 4;
-				return;
+				}
+				else {
+					testState = 4;
+				}
+
+				// Send message up
+				const telemetryIspInfo = {
+					processedString: clientIp,
+					rawIspInfo: typeof ispInfo === "object" ? ispInfo : ""
+				};
+				const result = {
+					ispInfo: telemetryIspInfo,
+					dl: Number.parseFloat(dlStatus),
+					ul: Number.parseFloat(ulStatus),
+					dl_ping: 0,
+					ul_ping: 0,
+					ping: Number.parseFloat(pingStatus),
+					jitter: Number.parseFloat(jitterStatus),
+					log: settings.telemetry_level > 1 ? log : "",
+					extra: settings.telemetry_extra
+				}
+
+				const channel = new BroadcastChannel('speedtest_result');
+				channel.postMessage(result);
 			}
 			switch (settings.test_order.charAt(test_pointer)) {
 				case "I":

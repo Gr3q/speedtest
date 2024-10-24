@@ -53,6 +53,11 @@ function Speedtest() {
   );
 }
 
+const channel = new BroadcastChannel('speedtest_result');
+channel.addEventListener('message', event => {
+  parent?.postMessage({type: "speedtest_result", data: event.data}, '*');
+});
+
 Speedtest.prototype = {
   constructor: Speedtest,
   /**
